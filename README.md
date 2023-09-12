@@ -15,8 +15,10 @@ You neeed to create two constructors:
 ## Develop Repository
 We will develop a repository class `ConcertRepository` that will manage the data. The repository will extend `CrudRepository` interface. Currently, we do not need any method in the repository. We will use the methods provided by `CrudRepository` interface.
 
+There is `data.sql`, which initializes the database with some data. You can use this data to test your application.
+
 ## Develop Controller
-This controller is similar to the previous lab, except it uses ConcertRepository to manage data, instead of HashMap. 
+This controller is similar to the previous lab, except it uses `ConcertRepository` to manage data, instead of `HashMap`. 
 We will develop a controller class `ConcertController` that will handle the HTTP requests. The controller will have the following methods:
 * `listConcerts`: This method will handle the HTTP GET request to `/concerts` URL. It will return the `concerts` view that will display the list of concerts.
 * `addAConcertForm`: This method will handle the HTTP GET request and return the `add-concert-form` view that will display the form to add a new concert.
