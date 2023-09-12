@@ -12,7 +12,6 @@
         <li th:each="concert : ${concerts}">
             <a  th:href="@{/delete-concert/{id}(id=${concert.id})}">Delete</a>
             <span th:text="${concert.title}"></span> 
-            <span th:text="${concert.location}"></span>
            <span th:text="${concert.date}"></span>
         </li>
     </ul>

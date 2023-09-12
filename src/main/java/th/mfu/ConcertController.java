@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,12 +18,21 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import th.mfu.domain.Concert;
+
 @Controller
 public class ConcertController {
-    // TODO: create hashmap of concerts for storing data
-    private static int nextId = 1;
-    private HashMap<Integer, Concert> concerts = new HashMap<Integer, Concert>();
+    // TODO: define repository for concert and @Autowired
+    @Autowired
+    ConcertRepository repository;
 
+    
+
+    public ConcertController(ConcertRepository repository) {
+        this.repository = repository;
+    }
+
+    //TODO: add initBinder for date format
     @InitBinder
     public final void initBinderUsuariosFormValidator(final WebDataBinder binder, final Locale locale) {
         final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", locale);
@@ -31,8 +41,8 @@ public class ConcertController {
 
     @GetMapping("/concerts")
     public String listConcerts(Model model) {
-        // TODO: add concerts to model
-        model.addAttribute("concerts", concerts.values());
+        // TODO: list all concerts
+        model.addAttribute("concerts", repository.findAll());
         // TODO: return a template to list concerts
         return "list-concert";
     }
@@ -47,18 +57,16 @@ public class ConcertController {
 
     @PostMapping("/concerts")
     public String saveConcert(@ModelAttribute Concert concert) {
-        // TODO: add concert to list of concerts
-        concert.setId(nextId);
-        concerts.put(nextId, concert);
-        nextId++;
+        // TODO: add concert to DB
+        repository.save(concert);
         // TODO: redirect to list concerts
         return "redirect:/concerts";
     }
 
     @GetMapping("/delete-concert/{id}")
-    public String deleteConcert(@PathVariable int id) {
-        // TODO: remove concert from list of concerts
-        concerts.remove(id);
+    public String deleteConcert(@PathVariable long id) {
+        // TODO: delete concert from DB
+        repository.deleteById(id);
         // TODO: redirect to list concerts
         return "redirect:/concerts";
     }
@@ -66,9 +74,8 @@ public class ConcertController {
     
     @GetMapping("/delete-concert")
     public String removeAllConcerts() {
-        // clear all employees and reset id
-        concerts.clear();
-        nextId = 1;
+        // delete all employees 
+        repository.deleteAll();
         return "redirect:/concerts";
     }
 

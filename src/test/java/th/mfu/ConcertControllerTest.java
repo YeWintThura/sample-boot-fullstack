@@ -1,74 +1,95 @@
 package th.mfu;
 
-import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import static org.mockito.ArgumentMatchers.any;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(ConcertController.class)
+import th.mfu.domain.Concert;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.ui.Model;
+
+
+
+import static org.junit.jupiter.api.Assertions.*;
+
 public class ConcertControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Mock
+    private ConcertRepository repository;
 
-    @Test
-    public void testAddAndListConcerts() throws Exception {
-        List<Concert> Concerts = new ArrayList<>();
-        Concerts.add(new Concert("xxxxx", "description of xxxx"));
-        Concerts.add(new Concert("yyyyyy", "description of yyyyy"));
+    @Mock
+    private Model model;
 
-        for (Concert Concert : Concerts) {
-            mockMvc.perform(post("/concerts")
-                    .param("title", Concert.getTitle())
-                    .param("description", Concert.getDescription()))
-                    .andExpect(redirectedUrl("/concerts"));
-        }
+    private ConcertController controller;
 
-        mockMvc.perform(get("/concerts"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("list-concert"))
-                .andExpect(model().attribute("concerts", hasSize(2)));
-    }
-
-    @AfterEach
-    public void resetDb() throws Exception {
-        mockMvc.perform(get("/delete-concert"));
+    @BeforeEach
+    public void setUp() {
+        MockitoAnnotations.initMocks(this); // Initialize mocks
+        controller = new ConcertController(repository);
     }
 
     @Test
-    public void testAddAndDeleteConcerts() throws Exception {
+    public void testListConcerts() {
+        // Arrange
+        List<Concert> concertList = new ArrayList<>();
+        when(repository.findAll()).thenReturn(concertList);
 
-        List<Concert> Concerts = new ArrayList<>();
-        Concerts.add(new Concert("xxxxx", "description of xxxx"));
-        Concerts.add(new Concert("yyyyyy", "description of yyyyy"));
+        // Act
+        String viewName = controller.listConcerts(model);
 
-        for (Concert Concert : Concerts) {
-            mockMvc.perform(post("/concerts")
-                    .param("title", Concert.getTitle())
-                    .param("description", Concert.getDescription()))
-                    .andExpect(redirectedUrl("/concerts"));
-        }
-
-        mockMvc.perform(get("/delete-concert/1"))
-                .andExpect(view().name("redirect:/concerts"));
-
-        mockMvc.perform(get("/concerts"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("list-concert"))
-                .andExpect(model().attribute("concerts", hasSize(1)));
-
+        // Assert
+        assertEquals("list-concert", viewName);
+        verify(model).addAttribute("concerts", concertList);
     }
 
+    @Test
+    public void testAddAConcertForm() {
+        // Act
+        String viewName = controller.addAConcertForm(model);
+
+        // Assert
+        assertEquals("add-concert-form", viewName);
+    }
+
+    @Test
+    public void testSaveConcert() {
+        // Arrange
+        Concert concert = new Concert();
+
+        // Act
+        String viewName = controller.saveConcert(concert);
+
+        // Assert
+        assertEquals("redirect:/concerts", viewName);
+        verify(repository).save(concert);
+    }
+
+    @Test
+    public void testDeleteConcert() {
+        // Arrange
+        long concertId = 1L;
+
+        // Act
+        String viewName = controller.deleteConcert(concertId);
+
+        // Assert
+        assertEquals("redirect:/concerts", viewName);
+        verify(repository).deleteById(concertId);
+    }
+
+    @Test
+    public void testRemoveAllConcerts() {
+        // Act
+        String viewName = controller.removeAllConcerts();
+
+        // Assert
+        assertEquals("redirect:/concerts", viewName);
+        verify(repository).deleteAll();
+    }
 }
+
