@@ -4,15 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Concert</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>Add Concert</h1>
-    <form th:action="@{/concerts}" th:object="${concert}" method="post">
-        <label for="title">Title:</label>
-        <input type="text" id="title" th:field="*{title}" required><br>
-        <label for="date">Date:</label>
-        <input type="date" id="date" th:field="*{date}" required><br>
-        <button type="submit">Save Employee</button>
-    </form>
+    <div class="container mt-5">
+        <h1>Add Concert</h1>
+        <form th:action="@{/concerts}" th:object="${newconcert}" method="post">
+            <div class="form-group">
+                <label for="title">Title:</label>
+                <input type="text" class="form-control" id="title" th:field="*{title}" required>
+                <label for="date">Date:</label>
+                <input type="date" class="form-control" id="date" th:field="*{date}" required>
+            </div>
+            <hr/>
+            <h2>Performer</h2>
+            <div class="form-group">
+                <label for="performerName">Name:</label>
+                <input type="text" class="form-control" id="performerName" th:field="*{performer.name}" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Concert</button>
+        </form>
+    </div>
+
 </body>
 </html>

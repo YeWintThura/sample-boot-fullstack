@@ -1,95 +1,111 @@
 package th.mfu;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
 import th.mfu.domain.Concert;
+import th.mfu.domain.Seat;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.ui.Model;
-
-
+import org.springframework.validation.BindingResult;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ConcertControllerTest {
 
+    @InjectMocks
+    private ConcertController concertController;
+
     @Mock
-    private ConcertRepository repository;
+    private ConcertRepository concertRepository;
+
+    @Mock
+    private SeatRepository seatRepository;
 
     @Mock
     private Model model;
 
-    private ConcertController controller;
+    @Mock
+    private BindingResult bindingResult;
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this); // Initialize mocks
-        controller = new ConcertController(repository);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
     public void testListConcerts() {
-        // Arrange
         List<Concert> concertList = new ArrayList<>();
-        when(repository.findAll()).thenReturn(concertList);
+        // Add sample concerts to the list
 
-        // Act
-        String viewName = controller.listConcerts(model);
+        when(concertRepository.findAll()).thenReturn(concertList);
 
-        // Assert
-        assertEquals("list-concert", viewName);
-        verify(model).addAttribute("concerts", concertList);
+        String viewName = concertController.listConcerts(model);
+
+        assert(viewName.equals("list-concert"));
+        verify(concertRepository, times(1)).findAll();
+        verify(model, times(1)).addAttribute(eq("concerts"), anyList());
     }
 
     @Test
     public void testAddAConcertForm() {
-        // Act
-        String viewName = controller.addAConcertForm(model);
+        String viewName = concertController.addAConcertForm(model);
 
-        // Assert
-        assertEquals("add-concert-form", viewName);
+        assert(viewName.equals("add-concert-form"));
+        verify(model, times(1)).addAttribute(eq("newconcert"), any(Concert.class));
     }
 
     @Test
     public void testSaveConcert() {
-        // Arrange
-        Concert concert = new Concert();
+        Concert newConcert = new Concert();
+        when(bindingResult.hasErrors()).thenReturn(false);
 
-        // Act
-        String viewName = controller.saveConcert(concert);
+        String viewName = concertController.saveConcert(newConcert);
 
-        // Assert
-        assertEquals("redirect:/concerts", viewName);
-        verify(repository).save(concert);
+        assert(viewName.equals("redirect:/concerts"));
+        verify(concertRepository, times(1)).save(newConcert);
     }
 
     @Test
     public void testDeleteConcert() {
-        // Arrange
-        long concertId = 1L;
+        long concertId = 1001L;
 
-        // Act
-        String viewName = controller.deleteConcert(concertId);
+        String viewName = concertController.deleteConcert(concertId);
 
-        // Assert
-        assertEquals("redirect:/concerts", viewName);
-        verify(repository).deleteById(concertId);
+        assert(viewName.equals("redirect:/concerts"));
+        verify(seatRepository, times(1)).deleteByConcertId(concertId);
+        verify(concertRepository, times(1)).deleteById(concertId);
     }
 
-    @Test
-    public void testRemoveAllConcerts() {
-        // Act
-        String viewName = controller.removeAllConcerts();
+      @Test
+    public void testSaveSeat() {
+        long concertId = 1L;
+        Concert concert = new Concert();
+        concert.setId(concertId);
 
-        // Assert
-        assertEquals("redirect:/concerts", viewName);
-        verify(repository).deleteAll();
+        Seat newSeat = new Seat();
+        newSeat.setConcert(concert);
+
+        when(concertRepository.findById(concertId)).thenReturn(Optional.of(concert));
+        when(seatRepository.save(newSeat)).thenReturn(newSeat);
+
+        String viewName = concertController.saveSeat(newSeat, concertId);
+
+        assert(viewName.equals("redirect:/concerts/" + concertId + "/seats"));
+        verify(concertRepository, times(1)).findById(concertId);
+        verify(seatRepository, times(1)).save(newSeat);
     }
 }
+
 
