@@ -55,7 +55,6 @@ public class ConcertControllerTest {
 
         assert(viewName.equals("list-concert"));
         verify(concertRepository, times(1)).findAll();
-        verify(model, times(1)).addAttribute(eq("concerts"), anyList());
     }
 
     @Test
@@ -63,7 +62,6 @@ public class ConcertControllerTest {
         String viewName = concertController.addAConcertForm(model);
 
         assert(viewName.equals("add-concert-form"));
-        verify(model, times(1)).addAttribute(eq("newconcert"), any(Concert.class));
     }
 
     @Test

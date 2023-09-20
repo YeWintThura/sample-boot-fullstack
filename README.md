@@ -81,11 +81,13 @@ We will develop a controller class `ConcertController` that will handle the HTTP
 * Add a form to add a new seat. The form should have the fields: `number` and `zone`. The form should have a submit button.
 
 ## Test Web App using Browser
-Run the application using App.java class. Open the browser and go to `/concerts` the following URL:
+Run the application using App.java class. Open the browser and go to `/concerts` such as the following URL:
+
+on vscode running on your local machine:
 ```
 http://localhost:8100/concerts
 ```
-or if you use codespace
+or if you use codespace:
 ```
 https://<your-codespace-name>-8100.xxxxxxx.dev/concerts
 ```
