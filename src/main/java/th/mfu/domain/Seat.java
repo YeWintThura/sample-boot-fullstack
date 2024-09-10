@@ -21,6 +21,7 @@ public class Seat {
     private Long id;
     private String number;
     private String zone;
+    private String attendee;
     private boolean booked;
 
     //TODO: add many-to-one relationship to concert with cascade type MERGE
@@ -66,6 +67,14 @@ public class Seat {
 
     public void setConcert(Concert concert) {
         this.concert = concert;
+    }
+
+    public String getAttendee() {
+        return attendee;
+    }
+
+    public void setAttendee(String attendee) {
+        this.attendee = attendee;
     }
 
 

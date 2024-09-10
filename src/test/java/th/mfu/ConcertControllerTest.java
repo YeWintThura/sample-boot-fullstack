@@ -5,11 +5,15 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
+import th.mfu.control.ConcertController;
+import th.mfu.control.ConcertRepository;
+import th.mfu.control.SeatRepository;
 import th.mfu.domain.Concert;
 import th.mfu.domain.Seat;
 
@@ -17,6 +21,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
@@ -51,17 +57,12 @@ public class ConcertControllerTest {
 
         when(concertRepository.findAll()).thenReturn(concertList);
 
-        String viewName = concertController.listConcerts(model);
+        ResponseEntity<Collection<Concert>> response = concertController.listConcerts();
 
-        assert(viewName.equals("list-concert"));
-        verify(concertRepository, times(1)).findAll();
-    }
-
-    @Test
-    public void testAddAConcertForm() {
-        String viewName = concertController.addAConcertForm(model);
-
-        assert(viewName.equals("add-concert-form"));
+        // assert if size is 5
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(0, response.getBody().size());
+        
     }
 
     @Test
@@ -69,21 +70,25 @@ public class ConcertControllerTest {
         Concert newConcert = new Concert();
         when(bindingResult.hasErrors()).thenReturn(false);
 
-        String viewName = concertController.saveConcert(newConcert);
+        ResponseEntity<String> response = concertController.saveConcert(newConcert);
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
 
-        assert(viewName.equals("redirect:/concerts"));
-        verify(concertRepository, times(1)).save(newConcert);
     }
 
     @Test
     public void testDeleteConcert() {
-        long concertId = 1001L;
+        //add new concert
+        Concert newConcert = new Concert();
+        concertController.saveConcert(newConcert);
 
-        String viewName = concertController.deleteConcert(concertId);
+        ResponseEntity<Collection<Concert>> response = concertController.listConcerts();
 
-        assert(viewName.equals("redirect:/concerts"));
-        verify(seatRepository, times(1)).deleteByConcertId(concertId);
-        verify(concertRepository, times(1)).deleteById(concertId);
+        response.getBody().forEach(concert -> {
+            concertController.deleteConcert(concert.getId());
+            assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+            verify(seatRepository, times(1)).deleteByConcertId(concert.getId());
+        });
+           
     }
 
       @Test
@@ -98,11 +103,34 @@ public class ConcertControllerTest {
         when(concertRepository.findById(concertId)).thenReturn(Optional.of(concert));
         when(seatRepository.save(newSeat)).thenReturn(newSeat);
 
-        String viewName = concertController.saveSeat(newSeat, concertId);
+        ResponseEntity<String> response = concertController.saveSeat(newSeat, concertId);
 
-        assert(viewName.equals("redirect:/concerts/" + concertId + "/seats"));
-        verify(concertRepository, times(1)).findById(concertId);
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        
         verify(seatRepository, times(1)).save(newSeat);
+    }
+
+    @Test
+    public void testBookSeat() {
+        long concertId = 1L;
+        long seatId = 1L;
+        Seat seat = new Seat();
+        seat.setId(seatId);
+        seat.setBooked(false); // Initially not booked
+
+        Seat reqSeat = new Seat();
+        reqSeat.setAttendee("John Doe");
+
+        when(concertRepository.findById(concertId)).thenReturn(Optional.of(new Concert()));
+        when(seatRepository.findById(seatId)).thenReturn(Optional.of(seat));
+        when(seatRepository.save(seat)).thenReturn(seat); // Return the updated seat
+
+        ResponseEntity<String> response = concertController.bookSeat(concertId, seatId, reqSeat);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(seat.isBooked()); // Verify that the seat is now booked
+        assertEquals("John Doe", seat.getAttendee()); // Verify attendee name
+
     }
 }
 

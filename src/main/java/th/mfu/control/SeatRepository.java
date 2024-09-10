@@ -1,4 +1,4 @@
-package th.mfu;
+package th.mfu.control;
 
 import java.util.List;
 
@@ -8,5 +8,5 @@ import th.mfu.domain.Seat;
 
 public interface SeatRepository extends CrudRepository<Seat, Long>{
     public List<Seat> findByConcertId(Long concertId);
-    public List<Seat> deleteByConcertId(long id);
+    public List<Seat> deleteByConcertId(Long id);
 }

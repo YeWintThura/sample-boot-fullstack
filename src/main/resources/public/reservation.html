@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Concert Seat Reservation</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    h1 {
+      color: #333;
+    }
+    
+    #concertSelect {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    
+    #seats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* 3 seats per row */
+      grid-gap: 10px;
+    }
+    
+    .seat {
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      text-align: center;
+      cursor: pointer;
+      background-color: lightgreen; /* Available seat color */
+    }
+    
+    .seat:hover {
+      background-color: #90EE90; /* Lighter green on hover */
+    }
+    
+    .booked {
+      background-color: lightgray; /* Booked seat color */
+      cursor: not-allowed;
+    }
+    #attendeePopup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+      z-index: 1000; /* Ensure popup is on top */
+    }
+    </style>
+<script>
+$(document).ready(function() {
+  // Load concerts on page load
+  $.ajax({
+    url: "/concerts",
+    type: "GET",
+    success: function(concerts) {
+      // Populate concert dropdown
+      $.each(concerts, function(index, concert) {
+        $("#concertSelect").append(
+          $("<option>").val(concert.id).text(concert.title)
+        );
+      });
+
+      // Load seats for the first concert by default
+      loadSeats($("#concertSelect").val());
+    },
+    error: function() {
+      alert("Error loading concerts.");
+    }
+  });
+
+  // Function to load seats for a concert
+  function loadSeats(concertId) {
+    if (concertId === "") {
+      $("#seats").empty();
+      return;
+    }
+
+    $.ajax({
+      url: "/concerts/" + concertId + "/seats",
+      type: "GET",
+      success: function(seats) {
+        // Clear existing seats
+        $("#seats").empty();
+
+        // Iterate through seats and create HTML elements
+        $.each(seats, function(index, seat) {
+          var seatElement = $("<div>").addClass("seat");
+          seatElement.text(seat.number + " - " + seat.zone);
+
+          // Check if seat is booked
+          if (seat.booked) {
+            seatElement.addClass("booked");
+            seatElement.append("<BR>"+seat.attendee);
+          } else {
+            // Add click event to reserve seat
+            seatElement.click(function() {
+              reserveSeat(concertId, seat.id);
+            });
+          }
+
+          $("#seats").append(seatElement);
+        });
+      },
+      error: function() {
+        alert("Error loading seats.");
+      }
+    });
+  }
+
+  // Function to reserve a seat
+  function reserveSeat(concertId, seatId) {
+    // Show the attendee input popup
+    $("#attendeePopup").show();
+
+    // Handle popup form submission
+    $("#attendeeForm").submit(function(event) {
+      event.preventDefault();
+
+      var attendeeName = $("#attendeeName").val();
+
+      // Send AJAX request to reserve seat with attendee name
+      $.ajax({
+        url: "/concerts/" + concertId + "/seats/" + seatId + "/book",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({ attendee: attendeeName }), // Send attendee name as JSON
+        success: function() {
+          // Reload seats after reservation
+          loadSeats(concertId);
+          alert("Seat reserved successfully for " + attendeeName + "!");
+
+          // Close the popup
+          $("#attendeePopup").hide();
+        },
+        error: function() {
+          alert("Error reserving seat.");
+        }
+      });
+    });
+  }
+
+  // Event handler for concert selection change
+  $("#concertSelect").change(function() {
+    var selectedConcertId = $(this).val();
+    loadSeats(selectedConcertId);
+  });
+});
+</script>
+</head>
+<body>
+  <h1>Concert Seat Reservation</h1>
+
+  <!-- Dropdown to select concert -->
+  <select id="concertSelect">
+    <option value="">Select Concert</option> 
+    <!-- Options will be populated dynamically -->
+  </select>
+
+  <!-- Container for displaying seats -->
+  <div id="seats">
+    <!-- Seats will be displayed here -->
+  </div>
+
+    <!-- Attendee Input Popup -->
+    <div id="attendeePopup">
+        <h2>Enter Attendee Name</h2>
+        <form id="attendeeForm">
+          <input type="text" id="attendeeName" placeholder="Attendee Name" required>
+          <button type="submit">Confirm</button>
+        </form>
+      </div>
+</body>
+</html>
