@@ -1,6 +1,6 @@
- Web Lab - Spring Data with MVC
+ Web Lab - Spring Data Relationship
  ====================
-In this lab, we will develop a web application that support concert ticket's reservation. It consists of 2 parts: Admin and Front-end. We will only develop the admin part. The admin part is used to manage the concerts.  We will use Spring Data to manage the data that have relationships. We will use H2 as a database for this lab.
+In this lab, we will develop a web application that support concert ticket's reservation.  We will use Spring Data to manage the data that have relationships. We will use H2 as a database for this lab.
 
 # Develop Backend
 We will develop Model that has 2 entity classes. The concert can have many seats. A seat can belong to a concert.
@@ -84,39 +84,74 @@ We will develop a controller class `ConcertController` that will handle the HTTP
     * Returns a 404 NOT FOUND response if the concert or seat does not exist.
 
 
-## Front-end App
-The front-end application consists of two main pages:
+## Test API using Postman
 
-### `concerts.html`
+Run the application using App.java class. The application will start on port 8100. You can test all the API endpoints using Postman.
 
-This page displays a list of available concerts fetched from the backend API. Users can perform the following actions:
-
-- **View Concert Details:** Each concert listing shows basic information like title, date, and performer.
-- **Manage Seats:** Users can click on a concert to navigate to the `reservation.html` page for that specific concert.
-
-### `reservation.html`
-
-This page displays a seat map for a selected concert. Users can:
-
-- **View Seat Availability:** The seat map visually represents available and booked seats.
-- **Reserve Seats:** Users can click on available seats to initiate a reservation. A popup will appear to enter the attendee's name before confirming the booking.
-
-The code in this front-end is complete, you may only need to change the host and port or replace it with codespace's URL
-
-## Test Web App using Browser
-Run the application using App.java class. Open the browser and go to `/concerts.html` such as the following URL:
-
-on vscode running on your local machine:
+### Base URL
 ```
-http://localhost:8100/concerts.html
+http://localhost:8100
 ```
-or if you use codespace:
-```
-https://<your-codespace-name>-8100.xxxxxxx.dev/concerts.html
-```
-You should be able to add concert, list all concerts, list all seats of a concert.
 
-Test booking a seat for a concert by going to `/reservation.html` page. You should be able to choose the concert, and book the seat.
+### API Endpoints
+
+#### 1. Get All Concerts
+- **Method:** GET
+- **URL:** `http://localhost:8100/concerts`
+- **Description:** Lists all available concerts
+
+#### 2. Create a New Concert
+- **Method:** POST
+- **URL:** `http://localhost:8100/concerts`
+- **Headers:** `Content-Type: application/json`
+- **Body (JSON):**
+```json
+{
+    "title": "Winter Music Festival",
+    "date": "2024-07-15",
+    "performer": "The Rock Band"
+}
+```
+
+#### 3. Delete a Concert
+- **Method:** DELETE
+- **URL:** `http://localhost:8100/concerts/{id}`
+- **Description:** Replace `{id}` with the actual concert ID (can be found in data.sql)
+
+#### 4. Get Seats for a Concert
+- **Method:** GET
+- **URL:** `http://localhost:8100/concerts/{concertId}/seats`
+- **Description:** Replace `{concertId}` with the actual concert ID (can be found in data.sql)
+
+#### 5. Create a New Seat
+- **Method:** POST
+- **URL:** `http://localhost:8100/concerts/{concertId}/seats`
+- **Description:** Replace `{concertId}` with the actual concert ID (can be found in data.sql)
+- **Headers:** `Content-Type: application/json`
+- **Body (JSON):**
+```json
+{
+    "number": "A1",
+    "zone": "VIP"
+}
+```
+
+#### 6. Book a Seat (Reserve)
+- **Method:** POST
+- **URL:** `http://localhost:8100/concerts/{concertId}/seats/{seatId}/book`
+- **Description:** Replace `{concertId}` with the actual concert ID and seat ID (can be found in data.sql)
+- **Headers:** `Content-Type: application/json`
+- **Body (JSON):**
+```json
+{
+    "attendee": "John Doe"
+}
+```
+
+#### 7. List Seats
+- **Method:** GET
+- **URL:** `http://localhost:8100/concerts/{concertId}/seats`
+- **Description:** Replace `{concertId}` with the actual concert ID (can be found in data.sql)
 
 ## Unit Test
 Run the unit tests in `ConcertControllerTest` class to test the service. You can run the tests using the following command:
