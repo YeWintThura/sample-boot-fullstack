@@ -45,25 +45,53 @@ lab-web-fullstack/
 
 ## 🚀 Getting Started
 
-### Step 1: Start the Backend
-```bash
-cd backend
-mvn spring-boot:run
-```
-The backend will start on http://localhost:8081
+### Method 1: Run from VS Code Classes (Recommended)
 
-### Step 2: Verify Backend is Running
-Open http://localhost:8081/health in your browser. You should see:
+#### Step 1: Start the Backend
+1. Open `backend/src/main/java/th/mfu/App.java` in VS Code
+2. Click the "Run" button above the `main` method, or press `Ctrl+F5`
+3. The backend will start on port 8081
+
+#### Step 2: Verify Backend is Running
+- **Local VS Code**: Open http://localhost:8081/health
+- **GitHub Codespaces**: Open https://your-codespace-name/health
+
+You should see:
 ```
 Backend is running on port 8081
 ```
 
-### Step 3: Start the Frontend
+#### Step 3: Start the Frontend
+1. Open `frontend/src/main/java/th/mfu/frontend/FrontendApplication.java` in VS Code
+2. Click the "Run" button above the `main` method, or press `Ctrl+F5`
+3. The frontend will start on port 8080
+
+#### Step 4: Access the Application
+- **Local VS Code**: Open http://localhost:8080
+- **GitHub Codespaces**: Open https://your-codespace-name
+
+### Method 2: Run from Terminal
+
+#### Step 1: Start the Backend
+```bash
+cd backend
+mvn spring-boot:run
+```
+
+#### Step 2: Start the Frontend (in a new terminal)
 ```bash
 cd frontend
 mvn spring-boot:run
 ```
-The frontend will start on http://localhost:8080
+
+### 🌐 URL Differences
+
+| Environment | Backend URL | Frontend URL |
+|-------------|-------------|--------------|
+| **Local VS Code** | http://localhost:8081 | http://localhost:8080 |
+| **GitHub Codespaces** | https://your-codespace-8081.preview.app.github.dev | https://your-codespace-8080.preview.app.github.dev |
+
+**Note**: In GitHub Codespaces, the URLs will be different. Look for the "Ports" tab in VS Code to see the exact URLs for your codespace.
 
 ## 📝 Exercise Tasks
 
@@ -71,7 +99,9 @@ The frontend will start on http://localhost:8080
 
 **Objective**: Implement the `loadConcerts()` function to fetch concerts from the API.
 
-**API Endpoint**: `GET http://localhost:8081/concerts`
+**API Endpoint**: 
+- Local: `GET http://localhost:8081/concerts`
+- Codespaces: `GET https://your-codespace-8081.preview.app.github.dev/concerts`
 
 **Your Task**: Complete the AJAX call in `app.js`:
 
@@ -135,7 +165,9 @@ const concertCard = $(`
 
 **Objective**: Implement seat loading and display functionality.
 
-**API Endpoint**: `GET http://localhost:8081/concerts/{concertId}/seats`
+**API Endpoint**: 
+- Local: `GET http://localhost:8081/concerts/{concertId}/seats`
+- Codespaces: `GET https://your-codespace-8081.preview.app.github.dev/concerts/{concertId}/seats`
 
 **Your Task**: Complete the `loadSeats()` and `displaySeats()` functions:
 
@@ -181,7 +213,9 @@ seats.forEach(function(seat) {
 
 **Objective**: Implement seat selection and booking functionality.
 
-**API Endpoint**: `POST http://localhost:8081/concerts/{concertId}/seats/{seatId}/book`
+**API Endpoint**: 
+- Local: `POST http://localhost:8081/concerts/{concertId}/seats/{seatId}/book`
+- Codespaces: `POST https://your-codespace-8081.preview.app.github.dev/concerts/{concertId}/seats/{seatId}/book`
 
 **Your Task**: Complete the booking form submission:
 
@@ -268,6 +302,10 @@ Your implementation should:
 | POST | `/concerts/{concertId}/seats/{seatId}/book` | Book a seat |
 | GET | `/health` | Health check |
 
+**Base URLs:**
+- **Local**: `http://localhost:8081`
+- **Codespaces**: `https://your-codespace-8081.preview.app.github.dev`
+
 ### Sample Concert Object:
 ```json
 {
@@ -304,10 +342,15 @@ Your implementation is complete when:
 
 ### Common Issues:
 
-1. **"Error loading concerts"**: Check if backend is running on port 8081
+1. **"Error loading concerts"**: 
+   - Check if backend is running on port 8081
+   - Verify you're using the correct URL (localhost vs codespace URL)
 2. **CORS errors**: Backend is configured to allow all origins
 3. **Seats not loading**: Verify concert ID is being passed correctly
 4. **Booking not working**: Check that attendee name is being sent in request body
+5. **URL issues in Codespaces**: 
+   - Check the "Ports" tab in VS Code for the correct URLs
+   - Make sure to use the codespace URL format: `https://your-codespace-8081.preview.app.github.dev`
 
 ### Debug Tips:
 - Use browser developer tools (F12) to check console for errors
