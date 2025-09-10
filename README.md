@@ -1,4 +1,4 @@
-# Concert Booking System - Frontend Exercise
+# Lab - Fullstack
 
 A hands-on exercise to implement a frontend for a concert booking system using HTML, CSS, jQuery, and AJAX.
 
