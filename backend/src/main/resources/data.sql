@@ -1,5 +1,4 @@
 
-
 INSERT INTO CONCERT (ID, TITLE, DATE, PERFORMER) VALUES (1001, 'Summer Music Festival', '2023-07-15','The Cool Cats');
 INSERT INTO CONCERT (ID, TITLE, DATE, PERFORMER) VALUES (1002, 'Rock Legends Live', '2023-08-20', 'The Rockin Tunes');
 INSERT INTO CONCERT (ID, TITLE, DATE, PERFORMER) VALUES (1003, 'Pop Hits Extravaganza', '2023-09-10','The Pop Stars');

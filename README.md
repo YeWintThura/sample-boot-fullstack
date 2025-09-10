@@ -1,160 +1,321 @@
- Web Lab - Spring Data Relationship
- ====================
-In this lab, we will develop a web application that support concert ticket's reservation.  We will use Spring Data to manage the data that have relationships. We will use H2 as a database for this lab.
+# Concert Booking System - Frontend Exercise
 
-# Develop Backend
-We will develop Model that has 2 entity classes. The concert can have many seats. A seat can belong to a concert.
+A hands-on exercise to implement a frontend for a concert booking system using HTML, CSS, jQuery, and AJAX.
 
-### Concert
- `Concert`  will represent a concert. It should have proper annotation for JPA such as `@Entity`. The class will have the following attributes:
-* `id`: This attribute will store the unique id of the concert. This attribute should have `@Id` and `@GeneratedValue` that has `GenerationType.AUTO`.
-* `title`: This attribute will store the name of the concert.
-* `date`: This attribute will store the date of the concert.
-* `performer`: This attribute will store the performer of the concert.
+## 🎯 Learning Objectives
 
-### Seat
-The class `Seat` will represent a seat. It should have proper annotation for JPA such as `@Entity`. The class will have the following attributes:
-* `id`: This attribute will store the unique id of the seat. This attribute should have `@Id` and `@GeneratedValue` that has `GenerationType.AUTO`.
-* `number`: This attribute will store the seat number of the seat.
-* `zone`: This attribute will store the price of the seat.
+By the end of this exercise, you will:
+- Understand how to make AJAX calls using jQuery
+- Learn to handle JSON responses from REST APIs
+- Implement dynamic DOM manipulation
+- Create responsive web interfaces
+- Work with modal dialogs and form handling
 
-### Relationship
-The relationship between the entities are as follows:
+## 📋 Exercise Overview
 
-* `Seat` has a relationship with `Concert`. (Make this relationship in the `Seat` class) This is a many-to-one relationship. Many seats can belong to a concert. Please use `CascadeType.MERGE` for this relationship, as we want to save the seat to an existing concert.
+You will implement the frontend for a concert booking system that communicates with a backend API. The backend is already provided and runs on port 8081.
 
-There is `data.sql`, which initializes the database with some data. You can use this data to test your application.
+### What's Already Provided:
+- ✅ Backend API with all endpoints
+- ✅ Database with sample concert and seat data
+- ✅ Basic HTML structure
+- ✅ CSS styling
+- ✅ jQuery library included
 
+### What You Need to Implement:
+- 🔲 AJAX calls to load concerts
+- 🔲 Dynamic concert display
+- 🔲 Seat selection functionality
+- 🔲 Booking form handling
+- 🔲 Error handling
 
-## Develop Repository
-- Develop a repository class `ConcertRepository` that will manage the data. The repository will extend `CrudRepository` interface. Currently, we do not need any method in the repository. We will use the methods provided by `CrudRepository` interface.
-* `findAll`: This method gives all concert as `List<Concert>`
+## 🏗️ Project Structure
 
-- develop a repository class `SeatRepository` that will manage the data. The repository will extend `CrudRepository` interface. Currently, we do not need any method in the repository. Add the following derived method
-  * `findByConcertId`: This method will find all seats that belong to a concert with the given id.
-  * `deleteByConcertId`: This method will delete all seats that belong to a concert with the given id.
-
-
-We will use H2 as a database for this lab. Add the following to the `application.properties` file under `src/main/resources` folder:
 ```
-spring.datasource.url=jdbc:h2:mem:testdb
-spring.datasource.driverClassName=org.h2.Driver
-spring.datasource.username=sa
-spring.datasource.password=password
-spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
-spring.jpa.show-sql = true
-spring.jpa.defer-datasource-initialization=true
-spring.jpa.hibernate.ddl-auto=create
-spring.datasource.initialization-mode=always
-spring.jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+lab-web-fullstack/
+├── backend/          # Backend API (port 8081) - PROVIDED
+├── frontend/         # Frontend (port 8080) - YOU IMPLEMENT
+│   ├── src/main/resources/static/
+│   │   ├── index.html    # Basic structure - PROVIDED
+│   │   ├── styles.css    # Styling - PROVIDED
+│   │   └── app.js        # JavaScript - YOU IMPLEMENT
+│   └── pom.xml
+└── pom.xml
 ```
 
-## Develop Controller
-We will develop a controller class `ConcertController` that will handle the HTTP requests. 
+## 🚀 Getting Started
 
-- The controller must have a contructor that takes `ConcertRepository` and `SeatRepository` as a parameters. 
-
-- The controller will have the following methods:
-* **`GET /concerts`**
-    * Lists all concerts.
-    * Returns a 200 OK response with a collection of `Concert` objects.
-* **`POST /concerts`**
-    * Creates a new concert.
-    * Expects a `Concert` object in the request body.
-    * Returns a 201 CREATED response with a message "concert saved".
-* **`DELETE /concerts/{id}`**
-    * Deletes a concert by ID.
-    * Returns a 204 NO CONTENT response if successful.
-    * Returns a 404 NOT FOUND response if the concert does not exist.
-* **`GET /concerts/{concertId}/seats`**
-    * Lists all seats for a given concert.
-    * Returns a 200 OK response with a collection of `Seat` objects.
-    * Returns a 404 NOT FOUND response if the concert does not exist.
-* **`POST /concerts/{concertId}/seats`**
-    * Creates a new seat for a given concert.
-    * Expects a `Seat` object in the request body.
-    * Returns a 201 CREATED response with a message "seat saved".
-    * Returns a 404 NOT FOUND response if the concert does not exist.
-* **`POST /concerts/{concertId}/seats/{seatId}/book`**
-    * Books a specific seat for a given concert.
-    * Expects a `Seat` object in the request body containing the attendee name.
-    * Find the seat by given id and set attendee name.
-    * Sets the `booked` status of the seat to `true`.
-    * Returns a 200 OK response with a message "seat booked".
-    * Returns a 404 NOT FOUND response if the concert or seat does not exist.
-
-
-## Test API using Postman
-
-Run the application using App.java class. The application will start on port 8100. You can test all the API endpoints using Postman.
-
-### Base URL
+### Step 1: Start the Backend
+```bash
+cd backend
+mvn spring-boot:run
 ```
-http://localhost:8100
+The backend will start on http://localhost:8081
+
+### Step 2: Verify Backend is Running
+Open http://localhost:8081/health in your browser. You should see:
+```
+Backend is running on port 8081
 ```
 
-### API Endpoints
+### Step 3: Start the Frontend
+```bash
+cd frontend
+mvn spring-boot:run
+```
+The frontend will start on http://localhost:8080
 
-#### 1. Get All Concerts
-- **Method:** GET
-- **URL:** `http://localhost:8100/concerts`
-- **Description:** Lists all available concerts
+## 📝 Exercise Tasks
 
-#### 2. Create a New Concert
-- **Method:** POST
-- **URL:** `http://localhost:8100/concerts`
-- **Headers:** `Content-Type: application/json`
-- **Body (JSON):**
-```json
-{
-    "title": "Winter Music Festival",
-    "date": "2024-07-15",
-    "performer": "The Rock Band"
+### Task 1: Load Concerts (20 points)
+
+**Objective**: Implement the `loadConcerts()` function to fetch concerts from the API.
+
+**API Endpoint**: `GET http://localhost:8081/concerts`
+
+**Your Task**: Complete the AJAX call in `app.js`:
+
+```javascript
+function loadConcerts() {
+    $.ajax({
+        url: 'http://localhost:8081/concerts',
+        method: 'GET',
+        dataType: 'json',
+        success: function(concerts) {
+            // TODO: Call displayConcerts function
+        },
+        error: function(xhr, status, error) {
+            // TODO: Show error message to user
+        }
+    });
 }
 ```
 
-#### 3. Delete a Concert
-- **Method:** DELETE
-- **URL:** `http://localhost:8100/concerts/{id}`
-- **Description:** Replace `{id}` with the actual concert ID (can be found in data.sql)
+**Expected Result**: When you open http://localhost:8080, you should see 5 concert cards displayed.
 
-#### 4. Get Seats for a Concert
-- **Method:** GET
-- **URL:** `http://localhost:8100/concerts/{concertId}/seats`
-- **Description:** Replace `{concertId}` with the actual concert ID (can be found in data.sql)
+### Task 2: Display Concerts (20 points)
 
-#### 5. Create a New Seat
-- **Method:** POST
-- **URL:** `http://localhost:8100/concerts/{concertId}/seats`
-- **Description:** Replace `{concertId}` with the actual concert ID (can be found in data.sql)
-- **Headers:** `Content-Type: application/json`
-- **Body (JSON):**
-```json
-{
-    "number": "A1",
-    "zone": "VIP"
+**Objective**: Implement the `displayConcerts()` function to show concerts in the UI.
+
+**Your Task**: Complete the function to create concert cards:
+
+```javascript
+function displayConcerts(concerts) {
+    const concertsList = $('#concerts-list');
+    concertsList.empty();
+
+    if (concerts.length === 0) {
+        // TODO: Show "No concerts available" message
+        return;
+    }
+
+    concerts.forEach(function(concert) {
+        // TODO: Create concert card HTML
+        // Include: title, performer, date, and "View Seats" button
+        // Use formatDate() function for date formatting
+    });
 }
 ```
 
-#### 6. Book a Seat (Reserve)
-- **Method:** POST
-- **URL:** `http://localhost:8100/concerts/{concertId}/seats/{seatId}/book`
-- **Description:** Replace `{concertId}` with the actual concert ID and seat ID (can be found in data.sql)
-- **Headers:** `Content-Type: application/json`
-- **Body (JSON):**
-```json
-{
-    "attendee": "John Doe"
+**Hint**: Use template literals to create HTML:
+```javascript
+const concertCard = $(`
+    <div class="concert-card" data-concert-id="${concert.id}">
+        <h3>${concert.title}</h3>
+        <p><strong>Performer:</strong> ${concert.performer}</p>
+        <p><strong>Date:</strong> ${formatDate(concert.date)}</p>
+        <button class="btn btn-primary view-seats-btn" data-concert-id="${concert.id}">
+            View Seats
+        </button>
+    </div>
+`);
+```
+
+### Task 3: Load and Display Seats (25 points)
+
+**Objective**: Implement seat loading and display functionality.
+
+**API Endpoint**: `GET http://localhost:8081/concerts/{concertId}/seats`
+
+**Your Task**: Complete the `loadSeats()` and `displaySeats()` functions:
+
+```javascript
+function loadSeats(concertId) {
+    $.ajax({
+        url: `http://localhost:8081/concerts/${concertId}/seats`,
+        method: 'GET',
+        dataType: 'json',
+        success: function(seats) {
+            // TODO: Call displaySeats function
+            // TODO: Hide concerts section, show seats section
+            // TODO: Store currentConcertId
+        },
+        error: function(xhr, status, error) {
+            // TODO: Show error alert
+        }
+    });
+}
+
+function displaySeats(seats) {
+    const seatsContainer = $('#seats-container');
+    seatsContainer.empty();
+
+    // TODO: Group seats by zone (Front, Middle, Rear)
+    // TODO: Create seat layout for each zone
+    // TODO: Handle booked vs available seats
 }
 ```
 
-#### 7. List Seats
-- **Method:** GET
-- **URL:** `http://localhost:8100/concerts/{concertId}/seats`
-- **Description:** Replace `{concertId}` with the actual concert ID (can be found in data.sql)
+**Hint**: Group seats by zone:
+```javascript
+const seatsByZone = {};
+seats.forEach(function(seat) {
+    if (!seatsByZone[seat.zone]) {
+        seatsByZone[seat.zone] = [];
+    }
+    seatsByZone[seat.zone].push(seat);
+});
+```
 
-## Unit Test
-Run the unit tests in `ConcertControllerTest` class to test the service. You can run the tests using the following command:
+### Task 4: Seat Selection and Booking (25 points)
+
+**Objective**: Implement seat selection and booking functionality.
+
+**API Endpoint**: `POST http://localhost:8081/concerts/{concertId}/seats/{seatId}/book`
+
+**Your Task**: Complete the booking form submission:
+
+```javascript
+$('#booking-form').on('submit', function(e) {
+    e.preventDefault();
+    
+    // TODO: Validate selected seat and attendee name
+    // TODO: Make AJAX call to book seat
+    // TODO: Handle success and error responses
+    // TODO: Refresh seat display after booking
+});
 ```
-mvn verify
+
+**Hint**: The booking request body should be:
+```javascript
+{
+    attendee: attendeeName
+}
 ```
+
+### Task 5: Event Handlers (10 points)
+
+**Objective**: Implement click event handlers for user interactions.
+
+**Your Task**: Add event handlers for:
+
+```javascript
+// TODO: Handle "View Seats" button clicks
+$(document).on('click', '.view-seats-btn', function() {
+    // TODO: Get concert ID and call loadSeats
+});
+
+// TODO: Handle available seat clicks
+$(document).on('click', '.seat.available', function() {
+    // TODO: Show booking modal with seat info
+});
+
+// TODO: Handle "Back to Concerts" button
+$(document).on('click', '#back-to-concerts', function() {
+    // TODO: Show concerts section, hide seats section
+});
+
+// TODO: Handle modal close/cancel
+$(document).on('click', '.close, #cancel-booking', function() {
+    // TODO: Hide modal and reset selected seat
+});
+```
+
+## 🧪 Testing Your Implementation
+
+### Test Cases:
+
+1. **Load Concerts**: Page should display 5 concerts on load
+2. **View Seats**: Clicking "View Seats" should show seat layout
+3. **Seat Selection**: Clicking available seats should open booking modal
+4. **Booking**: Entering name and confirming should book the seat
+5. **Visual Feedback**: Booked seats should appear red, available seats green
+6. **Navigation**: "Back to Concerts" should return to concert list
+
+### Sample Data:
+- **Concerts**: 5 concerts with different performers and dates
+- **Seats**: Multiple seats per concert organized by zones (Front, Middle, Rear)
+- **All seats start as available** (not booked)
+
+## 🎨 UI Requirements
+
+Your implementation should:
+- ✅ Display concerts in a responsive grid
+- ✅ Show seats organized by zones
+- ✅ Use different colors for available (green) vs booked (red) seats
+- ✅ Include a modal dialog for booking
+- ✅ Show proper error messages
+- ✅ Handle loading states
+
+## 📚 API Reference
+
+### Backend Endpoints:
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/concerts` | Get all concerts |
+| GET | `/concerts/{id}/seats` | Get seats for a concert |
+| POST | `/concerts/{concertId}/seats/{seatId}/book` | Book a seat |
+| GET | `/health` | Health check |
+
+### Sample Concert Object:
+```json
+{
+  "id": 1001,
+  "title": "Summer Music Festival",
+  "performer": "The Cool Cats",
+  "date": "2023-07-15"
+}
+```
+
+### Sample Seat Object:
+```json
+{
+  "id": 101,
+  "number": "A1",
+  "zone": "Front",
+  "booked": false,
+  "attendee": null
+}
+```
+
+## 🏆 Success Criteria
+
+Your implementation is complete when:
+- [ ] All 5 concerts load and display correctly
+- [ ] Clicking "View Seats" shows the seat layout
+- [ ] Available seats are clickable and open booking modal
+- [ ] Booking a seat works and updates the display
+- [ ] Booked seats show as unavailable (red)
+- [ ] Navigation between concerts and seats works
+- [ ] Error handling works for network issues
+
+## 🆘 Getting Help
+
+### Common Issues:
+
+1. **"Error loading concerts"**: Check if backend is running on port 8081
+2. **CORS errors**: Backend is configured to allow all origins
+3. **Seats not loading**: Verify concert ID is being passed correctly
+4. **Booking not working**: Check that attendee name is being sent in request body
+
+### Debug Tips:
+- Use browser developer tools (F12) to check console for errors
+- Use Network tab to see AJAX requests and responses
+- Add `console.log()` statements to debug your code
+
+## 📝 Submission
+
+Submit your completed `frontend/src/main/resources/static/app.js` file with all TODO items implemented.
+
+**Good luck! 🎵🎫**

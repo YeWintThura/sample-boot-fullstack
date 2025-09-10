@@ -114,5 +114,9 @@ public class ConcertController {
         return new ResponseEntity<>("seat booked", HttpStatus.OK);
     }
 
+    @GetMapping("/health")
+    public ResponseEntity<String> health() {
+        return new ResponseEntity<>("Backend is running on port 8081", HttpStatus.OK);
+    }
 
 }
