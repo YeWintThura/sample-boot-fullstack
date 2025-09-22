@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Customer Management</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Customer Management</h1>
+
+    <h2>Create New Customer</h2>
+    <form id="newCustomerForm">
+        <label for="name">Full Name:</label>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="address">Address:</label>
+        <input type="text" id="address" name="address" required><br><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+
+        <label for="phone">Phone:</label>
+        <input type="tel" id="phone" name="phone" required><br><br>
+
+        <label for="birthday">Birthday (dd-MM-yyyy):</label>
+        <input type="text" id="birthday" name="birthday" required><br><br>
+
+        <button type="submit">Create Customer</button>
+    </form>
+
+    <h2>All Customers</h2>
+    <div id="customerList">
+        <!-- Customer data will be displayed here -->
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Function to fetch and display all customers
+            function fetchCustomers() {
+                $.ajax({
+                    url: 'http://localhost:8081/customers', // Replace with your backend URL
+                    type: 'GET',
+                    success: function(data) {
+                        $('#customerList').empty(); // Clear previous data
+                        $.each(data, function(index, customer) {
+                            $('#customerList').append(`
+                                <div>
+                                    <b>Name:</b> ${customer.fullname}<br>
+                                    <b>Address:</b> ${customer.address}<br>
+                                    <b>Email:</b> ${customer.email}<br>
+                                    <b>Phone:</b> ${customer.tel}<br>
+                                    <b>Birthday:</b> ${customer.birthday}<br>
+                                </div>
+                                <hr>
+                            `);
+                        });
+                    },
+                    error: function(error) {
+                        console.error('Error fetching customers:', error);
+                    }
+                });
+            }
+
+            // Initial fetch on page load
+            fetchCustomers();
+
+            // Handle form submission
+            $('#newCustomerForm').submit(function(event) {
+                event.preventDefault(); // Prevent default form submission
+
+                // Get form data
+                var formData = {
+                    fullname: $('#name').val(),
+                    address: $('#address').val(),
+                    email: $('#email').val(),
+                    tel: $('#phone').val(),
+                    birthday: $('#birthday').val()
+                };
+
+                // Send AJAX request to create a new customer
+                $.ajax({
+                    url: 'http://localhost:8081/customers', // Replace with your backend URL
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    success: function(data) {
+                        console.log('Customer created successfully:', data);
+                        fetchCustomers(); // Refresh the customer list
+                        $('#newCustomerForm')[0].reset(); // Clear the form
+                    },
+                    error: function(error) {
+                        console.error('Error creating customer:', error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

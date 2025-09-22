@@ -1,4 +1,4 @@
-package th.mfu.domain.json;
+package th.mfu;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 public class LocalDateSerializer extends StdSerializer<LocalDate> {
-    private static DateTimeFormatter FORMATTER =  DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static DateTimeFormatter FORMATTER =  DateTimeFormatter.ofPattern("dd-MM-yyyy");
     public LocalDateSerializer() {
         this(null);
     }
