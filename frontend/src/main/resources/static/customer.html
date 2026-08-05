@@ -41,13 +41,21 @@
                     type: 'GET',
                     success: function(data) {
                         $('#customerList').empty(); // Clear previous data
-                        // TODO: loop over data with $.each and append a <div>
-                        //       per customer to #customerList showing
-                        //       fullname, address, email, tel, birthday
-                        //       (template literal `...${customer.fullname}...`)
+                        $.each(data, function(index, customer) {
+                            $('#customerList').append(`
+                                <div>
+                                    <b>Name:</b> ${customer.fullname}<br>
+                                    <b>Address:</b> ${customer.address}<br>
+                                    <b>Email:</b> ${customer.email}<br>
+                                    <b>Phone:</b> ${customer.tel}<br>
+                                    <b>Birthday:</b> ${customer.birthday}<br>
+                                </div>
+                                <hr>
+                            `);
+                        });
                     },
                     error: function(error) {
-                        // TODO: log the error to the console
+                        console.error('Error fetching customers:', error);
                     }
                 });
             }
@@ -59,14 +67,30 @@
             $('#newCustomerForm').submit(function(event) {
                 event.preventDefault(); // Prevent default form submission
 
-                // TODO: build a formData object from the input fields
-                //       keys must match the backend JSON: fullname, address,
-                //       email, tel, birthday
+                // keys must match the backend JSON (@JsonProperty): fullname, tel
+                var formData = {
+                    fullname: $('#name').val(),
+                    address: $('#address').val(),
+                    email: $('#email').val(),
+                    tel: $('#phone').val(),
+                    birthday: $('#birthday').val()
+                };
 
-                // TODO: $.ajax POST to http://localhost:8081/customers with
-                //       contentType 'application/json' and
-                //       data JSON.stringify(formData);
-                //       on success: fetchCustomers() and reset the form
+                // Send AJAX request to create a new customer
+                $.ajax({
+                    url: 'http://localhost:8081/customers',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    success: function(data) {
+                        console.log('Customer created successfully:', data);
+                        fetchCustomers(); // Refresh the customer list
+                        $('#newCustomerForm')[0].reset(); // Clear the form
+                    },
+                    error: function(error) {
+                        console.error('Error creating customer:', error);
+                    }
+                });
             });
         });
     </script>
