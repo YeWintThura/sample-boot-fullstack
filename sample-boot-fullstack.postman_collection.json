@@ -1,0 +1,85 @@
+{
+	"info": {
+		"name": "sample-boot-fullstack",
+		"description": "Backend requests for the fullstack demo — verify the API works BEFORE writing any JavaScript (Step 2 of TODO.md).\n\nStart the backend first: mvn spring-boot:run --file backend/pom.xml",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8081",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "List all customers (200 OK)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"status is 200 OK\", () => pm.response.to.have.status(200));",
+							"pm.test(\"note the JSON keys: fullname and tel\", () => {",
+							"    const first = pm.response.json()[0];",
+							"    pm.expect(first).to.have.property('fullname');",
+							"    pm.expect(first).to.have.property('tel');",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"url": "{{baseUrl}}/customers"
+			}
+		},
+		{
+			"name": "Create a customer (201 CREATED)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"status is 201 CREATED\", () => pm.response.to.have.status(201));"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"fullname\": \"Test Person\",\n  \"address\": \"99 Demo Rd\",\n  \"email\": \"test@example.com\",\n  \"tel\": \"0812345678\",\n  \"birthday\": \"01-01-2000\"\n}"
+				},
+				"url": "{{baseUrl}}/customers"
+			}
+		},
+		{
+			"name": "Get one customer (200 OK)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"status is 200 OK\", () => pm.response.to.have.status(200));"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"url": "{{baseUrl}}/customers/10001"
+			}
+		}
+	]
+}
