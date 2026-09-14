@@ -15,3 +15,16 @@ DevTools Network debugging, and CORS.
 mvn spring-boot:run --file backend\pom.xml    # REST API  → http://localhost:8081/customers
 mvn spring-boot:run --file frontend\pom.xml   # web page  → http://localhost:8080/customer.html
 ```
+
+## Running in GitHub Codespaces
+
+Same two commands (two terminals). The page derives the backend URL from its
+own address, so **no URL is ever edited**. One extra step, once per codespace:
+
+> **Ports tab → right-click port 8081 → Port Visibility → Public.**
+
+Why: the browser calls the backend directly (that is the whole point of the
+demo), and Codespaces blocks browser requests to private forwarded ports.
+Port 8080 can stay private — you open it yourself. If the customer list stays
+empty on Codespaces, port 8081 visibility is the first thing to check
+(DevTools → Network → the `customers` request will show a 401).
