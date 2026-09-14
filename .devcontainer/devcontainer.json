@@ -1,0 +1,23 @@
+{
+  "name": "sample-boot-fullstack",
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+
+  // Two Spring Boot apps: the frontend page (8080) calls the backend (8081)
+  // cross-origin from the BROWSER. customer.html derives the backend URL from
+  // its own origin, so no URL is ever edited — but on Codespaces the browser
+  // can only reach port 8081 if it is PUBLIC: Ports tab → right-click 8081 →
+  // Port Visibility → Public. That is the one manual step.
+  "forwardPorts": [8080, 8081],
+  "portsAttributes": {
+    "8080": { "label": "Frontend (open this)", "onAutoForward": "openPreview" },
+    "8081": { "label": "Backend API — set Public!", "onAutoForward": "notify" }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack"
+      ]
+    }
+  }
+}

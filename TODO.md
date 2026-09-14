@@ -63,7 +63,7 @@ mvn spring-boot:run --file frontend\pom.xml
 
 **Fill in together:**
 1. Build `formData` from the inputs — keys `fullname`, `address`, `email`, `tel`, `birthday` (must match Step 2's JSON!).
-2. `$.ajax` POST to `http://localhost:8081/customers`, `data: JSON.stringify(formData)`.
+2. `$.ajax` POST to `BACKEND + '/customers'`, `data: JSON.stringify(formData)`.
 3. On success: `fetchCustomers()` and `this.reset()` the form.
 
 **Try it:** add a customer — it appears at the bottom of the list with no page reload. Watch the POST in the Network tab; check the row in the H2 console (<http://localhost:8081/h2-console>).
@@ -95,4 +95,4 @@ You are now ready for the graded lab: [lab-web-fullstack](https://github.com/mae
 | Task 5 — event handlers | Steps 3–4 (buttons, submit) |
 | "CORS errors" in the lab's help section | Step 5 |
 
-> **Tip:** both apps must run at the same time — use two terminals. If a port is taken, find the old process or reboot the app. In Codespaces the URLs differ; check the **Ports** tab.
+> **Tip:** both apps must run at the same time — use two terminals. If a port is taken, find the old process or reboot the app. In Codespaces nothing needs editing (the page computes the backend URL itself) — but set port **8081 to Public** in the Ports tab, or every AJAX call gets a 401.

@@ -33,11 +33,19 @@
     </div>
 
     <script>
+        // Backend base URL — works on localhost AND GitHub Codespaces without editing:
+        //   localhost:  page on http://localhost:8080      -> backend http://localhost:8081
+        //   Codespaces: page on https://<name>-8080....dev -> backend https://<name>-8081....dev
+        // (On Codespaces, also set port 8081 to PUBLIC in the Ports tab — see README.)
+        const BACKEND = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+            ? 'http://localhost:8081'
+            : location.origin.replace('-8080', '-8081');
+
         $(document).ready(function() {
             // Function to fetch and display all customers
             function fetchCustomers() {
                 $.ajax({
-                    url: 'http://localhost:8081/customers', // the OTHER app - note the port!
+                    url: BACKEND + '/customers', // the OTHER app - note the port!
                     type: 'GET',
                     success: function(data) {
                         $('#customerList').empty(); // Clear previous data
@@ -78,7 +86,7 @@
 
                 // Send AJAX request to create a new customer
                 $.ajax({
-                    url: 'http://localhost:8081/customers',
+                    url: BACKEND + '/customers',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(formData),
