@@ -1,6 +1,15 @@
 {
   "name": "sample-boot-fullstack",
-  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "image": "mcr.microsoft.com/devcontainers/java:17-bookworm",
+  // Slim Java image (~1 GB) instead of universal:2 (~10 GB, not cached on
+  // Codespaces hosts, so it was pulled on every new codespace). Maven is
+  // not in the base image; the java feature installs it.
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "none",
+      "installMaven": true
+    }
+  },
 
   // Two Spring Boot apps: the frontend page (8080) calls the backend (8081)
   // cross-origin from the BROWSER. customer.html derives the backend URL from
