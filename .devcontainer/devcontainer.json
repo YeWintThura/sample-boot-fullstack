@@ -8,7 +8,7 @@
     "ghcr.io/devcontainers/features/java:1": {
       "version": "none",
       "installMaven": true
-    }
+    },"ghcr.io/devcontainers/features/node:1": { "version": "20" }
   },
 
   // Two Spring Boot apps: the frontend page (8080) calls the backend (8081)
